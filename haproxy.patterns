@@ -1,0 +1,20 @@
+## These patterns were tested w/ haproxy-1.4.15
+
+HAPROXYTIME (?!<[0-9])%{HOUR:haproxy_hour}:%{MINUTE:haproxy_minute}(?::%{SECOND:haproxy_second})(?![0-9])
+HAPROXYDATE %{MONTHDAY:haproxy_monthday}/%{MONTH:haproxy_month}/%{YEAR:haproxy_year}:%{HAPROXYTIME:haproxy_time}.%{INT:haproxy_milliseconds}
+
+# Override these default patterns to parse out what is captured in your haproxy.cfg
+HAPROXYCAPTUREDREQUESTHEADERS %{DATA:captured_request_headers}
+HAPROXYCAPTUREDRESPONSEHEADERS %{DATA:captured_response_headers}
+
+# HAPROXYCAPTUREDRESPONSEHEADERS %{DATA:response_header_content_type}\|%{DATA:response_header_content_encoding}\|%{DATA:response_header_cache_control}\|%{DATA:response_header_last_modified}
+
+# parse a haproxy 'httplog' line 
+HAPROXYHTTP %{SYSLOGTIMESTAMP:syslog_timestamp} %{IPORHOST:syslog_server} %{SYSLOGPROG}: %{IP:client_ip}:%{INT:client_port} \[%{HAPROXYDATE:accept_date}\] %{NOTSPACE:frontend_name} %{NOTSPACE:backend_name}/%{NOTSPACE:server_name} %{NUMBER:request_time:int}/%{NUMBER:queue_time:int}/%{NUMBER:backend_connect_time:int}/%{NUMBER:backend_response_time:int}/%{NUMBER:duration_time:int} %{NUMBER:http_status_code:int} %{NUMBER:byte_read:int} %{DATA:captured_request_cookie} %{DATA:captured_response_cookie} %{NOTSPACE:termination_state} %{INT:actconn}/%{INT:haconn}/%{INT:beconn}/%{INT:srvconn}/%{NOTSPACE:retries} %{NUMBER:queue_srv:int}/%{NUMBER:queue_backend:int} \\"(?:%{WORD:method} %{NOTSPACE:path_request}(?: HTTP/%{NUMBER:httpversion})?|-)\\"
+
+# parse a haproxy 'httplog' line
+#HAPROXYHTTPTRAFFIC %{IP:client_ip}:%{INT:client_port} \[%{HAPROXYDATE:accept_date}\] %{NOTSPACE:frontend_name} %{NOTSPACE:backend_name}/%{NOTSPACE:server_name} %{NUMBER:request_time:int}/%{NUMBER:queue_time:int}/%{NUMBER:backend_connect_time:int}/%{NUMBER:backend_response_time:int}/%{NUMBER:duration_time:int} %{NUMBER:http_status_code:int} %{NUMBER:byte_read:int} %{DATA:captured_request_cookie} %{DATA:captured_response_cookie} %{NOTSPACE:termination_state} %{INT:actconn}/%{INT:haconn}/%{INT:beconn}/%{INT:srvconn}/%{NOTSPACE:retries} %{NUMBER:queue_srv:int}/%{NUMBER:queue_backend:int} \\"(?:%{WORD:method} %{NOTSPACE:path_request}(?: HTTP/%{NUMBER:httpversion})?|-)\\"
+HAPROXYHTTPTRAFFIC %{TIMESTAMP_ISO8601:log_timestamp} %{NOTSPACE:hostname} %{WORD:process_name}\[%{INT:pid}\]: %{IP:client_ip}:%{INT:client_port} \[%{HAPROXYDATE:accept_date}\] %{NOTSPACE:frontend_name}~ %{NOTSPACE:backend_name}\/%{NOTSPACE:server_name} %{NUMBER:request_time:int}/%{NUMBER:queue_time:int}/%{NUMBER:backend_connect_time:int}/%{NUMBER:backend_response_time:int}/%{NUMBER:duration_time:int} %{NUMBER:http_status_code:int} %{NUMBER:byte_read:int} - - ---- %{NUMBER:actconn:int}/%{NUMBER:feconn:int}/%{NUMBER:beconn:int}/%{NUMBER:srvconn:int}/%{NOTSPACE:retries} %{NUMBER:queue_srv:int}/%{NUMBER:queue_backend:int} \\"(?:%{WORD:method} %{NOTSPACE:path_request}(?: HTTP/%{NUMBER:httpversion})?|-)\\"
+
+# parse a haproxy 'tcplog' line
+#HAPROXYTCP %{SYSLOGTIMESTAMP:syslog_timestamp} %{IPORHOST:syslog_server} %{SYSLOGPROG}: %{IP:client_ip}:%{INT:client_port} \[%{HAPROXYDATE:accept_date}\] %{NOTSPACE:frontend_name} %{NOTSPACE:backend_name}/%{NOTSPACE:server_name} %{INT:time_queue}/%{INT:time_backend_connect}/%{NOTSPACE:time_duration} %{NOTSPACE:bytes_read} %{NOTSPACE:termination_state} %{INT:actconn}/%{INT:feconn}/%{INT:beconn}/%{INT:srvconn}/%{NOTSPACE:retries} %{INT:srv_queue}/%{INT:backend_queue}
